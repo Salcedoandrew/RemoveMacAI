@@ -2,16 +2,21 @@ import Foundation
 
 /// The newest release on GitHub. Only asked when someone chooses Check for
 /// Updates, so RemoveMacAI otherwise makes no network requests.
+///
+/// Ventura variant: the fork's releases list is scanned newest-first for a
+/// Ventura tag. The workflow marks Ventura builds pre-release (their tags
+/// carry a dash), and GitHub's "latest" endpoint skips pre-releases, so
+/// asking it would never find one.
 enum Updates {
-  static let latestURL = URL(string: "https://api.github.com/repos/omlahore/RemoveMacAI/releases/latest")!
-  static let releasesPage = URL(string: "https://github.com/omlahore/RemoveMacAI/releases/latest")!
+  static let latestURL = URL(string: "https://api.github.com/repos/Salcedoandrew/RemoveMacAI/releases?per_page=30")!
+  static let releasesPage = URL(string: "https://github.com/Salcedoandrew/RemoveMacAI/releases")!
 
   struct Release {
     let version: String
     let page: URL
   }
 
-  /// The latest release that isn't a beta, or why it couldn't be read.
+  /// The newest Ventura release, or why it couldn't be read.
   static func latest() async -> Result<Release, Error> {
     var request = URLRequest(url: latestURL, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 15)
     request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
@@ -21,12 +26,15 @@ enum Updates {
       if let http = response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
         throw UpdateError.status(http.statusCode)
       }
-      guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-        let tag = json["tag_name"] as? String
-      else { throw URLError(.cannotParseResponse) }
+      guard let releases = try JSONSerialization.jsonObject(with: data) as? [[String: Any]] else {
+        throw URLError(.cannotParseResponse)
+      }
+      guard let release = releases.first(where: { ($0["tag_name"] as? String)?.contains("ventura") == true }),
+        let tag = release["tag_name"] as? String
+      else { throw UpdateError.noVenturaRelease }
       let version = tag.hasPrefix("v") ? String(tag.dropFirst()) : tag
       guard isVersion(version) else { throw UpdateError.notAVersion(tag) }
-      let page = (json["html_url"] as? String).flatMap(URL.init(string:)) ?? releasesPage
+      let page = (release["html_url"] as? String).flatMap(URL.init(string:)) ?? releasesPage
       return .success(Release(version: version, page: page))
     } catch {
       return .failure(error)
@@ -36,12 +44,14 @@ enum Updates {
   enum UpdateError: LocalizedError {
     case status(Int)
     case notAVersion(String)
+    case noVenturaRelease
 
     var errorDescription: String? {
       switch self {
       case .status(403), .status(429): return "GitHub is limiting requests right now. Try again in a while."
       case .status(let code): return "GitHub answered with HTTP \(code)."
       case .notAVersion(let tag): return "The latest release is tagged \"\(tag)\", which isn't a version number."
+      case .noVenturaRelease: return "No Ventura release found on GitHub yet."
       }
     }
   }
