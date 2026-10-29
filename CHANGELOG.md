@@ -9,6 +9,24 @@
 - The app is translated into Hindi and Urdu (#101). Urdu keeps the names of macOS screens and buttons in English, since macOS has no Urdu interface.
 - Block Music launches is now called Stop Music from opening, even by hand, and its warning says Music won't open at all until you undo it. The old name read as if only AirPods were blocked (#67).
 
+## 1.2.0-ventura.1
+
+Ventura (macOS 13) variant. Apple Intelligence does not exist on
+Ventura, so this build is the rest of RemoveMacAI: the privacy,
+annoyance, Finder, Dock, typing, background-item and storage tweaks,
+with undo. The AI features hide themselves on Ventura, and the
+generated profile contains no Apple Intelligence keys.
+
+- Runs on macOS 13.0 and later (Apple silicon). The platform floor,
+  run gate and app minimum version were lowered from 15.1.
+- Tweak floors re-audited for Ventura: 36 of 41 tweaks are offered.
+  Still hidden because their settings do not exist on Ventura:
+  desktop widgets and click-wallpaper-to-desktop (Sonoma),
+  iPhone Mirroring, Book Store and tiled-window gaps (Sequoia).
+- Check for Updates only offers releases tagged with `ventura`,
+  from this fork's releases list. It never offers an upstream build,
+  which needs macOS 15.1+.
+
 ## 1.2.0-beta.1
 
 A beta for macOS 15 (Sequoia). The one-line installer and Homebrew stay on 1.1.4 until it's out of beta.
