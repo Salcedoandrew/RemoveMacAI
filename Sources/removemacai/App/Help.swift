@@ -207,7 +207,9 @@ struct SettingsGuide: View {
       }
       .frame(height: 200)
     }
-    .background(RoundedRectangle(cornerRadius: 10).fill(.background.secondary))
+    // Ventura: .background.secondary is a macOS 14 hierarchical style;
+    // controlBackgroundColor is the closest 13-safe fill.
+    .background(RoundedRectangle(cornerRadius: 10).fill(Color(nsColor: .controlBackgroundColor)))
     .clipShape(RoundedRectangle(cornerRadius: 10))
     .overlay(RoundedRectangle(cornerRadius: 10).stroke(.separator))
     .accessibilityElement(children: .ignore)
