@@ -19,7 +19,7 @@ typing, background-item and storage tweaks, with undo.
   at `14.0` (their WindowManager keys are Sonoma-only). The three
   already-gated `15.0` tweaks (`iphone-mirroring`, `book-store`,
   `tile-margins`) stay hidden on Ventura.
-- `Sources/removemacai/Commands.swift`: version `1.2.0-ventura.1`, so
+- `Sources/removemacai/Commands.swift`: version `1.2.0-ventura.2`, so
   this build never reports itself as an upstream release.
 - `Sources/removemacai/Updates.swift`: Check for Updates scans this
   fork's releases list newest-first and only offers tags carrying
@@ -60,14 +60,17 @@ the local commit history.
    and enable them" (this is the gate that actually blocks runs);
    (b) Settings > Actions > Allow all actions and reusable workflows.
    If a tag push fired while the banner gate was still up, no run is
-   created retroactively — re-run the build by hand instead of
-   re-creating the release: Actions > Release > Run workflow, branch
-   `ventura`, tag input `v1.2.0-ventura.1` (the workflow takes the
-   tag as an input for dispatch runs, since a dispatch run's ref is
-   the branch, and uploads into the existing release).
+   created retroactively. The manual "Run workflow" button is not a
+   fallback here either: GitHub only offers it when the workflow file
+   on the DEFAULT branch has a `workflow_dispatch` trigger, and this
+   fork keeps the variant on `ventura`. The working fix is a fresh
+   tag push after enabling — which is why the first CI-built release
+   is `1.2.0-ventura.2` (the `.1` release predates the enabling and
+   has no assets; the workflow still carries the dispatch trigger
+   for future use if the variant is ever merged to main).
 3. Create the release in the web UI (the connector has no tag tool):
-   tag `v1.2.0-ventura.1`, target branch `ventura`, title
-   `v1.2.0-ventura.1`, notes from the `## 1.2.0-ventura.1`
+   tag `v1.2.0-ventura.2`, target branch `ventura`, title
+   `v1.2.0-ventura.2`, notes from the `## 1.2.0-ventura.2`
    CHANGELOG section, marked pre-release. Creating it creates the
    tag, which triggers the Release workflow on macos-26: build,
    then `selftest` (a failure blocks publishing), then packaging
