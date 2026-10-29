@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches: [main]
-  pull_request:
+    pull_request:
 
 permissions:
   contents: read
@@ -18,4 +18,4 @@ jobs:
       - name: Self-test
         run: "$(swift build -c release --arch arm64 --show-bin-path)/removemacai selftest"
       - name: App bundle
-        run: tools/build-app.sh
+        run: bash tools/build-app.sh
