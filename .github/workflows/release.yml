@@ -3,6 +3,16 @@ name: Release
 on:
   push:
     tags: ["v*"]
+  # Manual re-run path: a fresh fork's workflows start disabled behind an
+  # Actions-tab banner (separate from the permissions setting), so the
+  # first tag push may never fire. Dispatching by hand re-runs the same
+  # build and uploads into the existing release.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to publish into"
+        required: true
+        default: "v1.2.0-ventura.1"
 
 permissions:
   contents: write
@@ -38,14 +48,17 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          version="${GITHUB_REF_NAME#v}"
+          TAG="${{ inputs.tag || github.ref_name }}"
+          version="${TAG#v}"
           awk -v v="## $version" '$0 == v {on=1; next} /^## / {on=0} on' CHANGELOG.md > notes.md
-          pre=""; [[ "$GITHUB_REF_NAME" == *-* ]] && pre="--prerelease"
+          pre=""; [[ "$TAG" == *-* ]] && pre="--prerelease"
           # Fork adaptation: the connector has no tag tool, so the release
           # (and its tag) are created in the web UI first, which triggers
           # this workflow. Upload into that release when it already exists.
-          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            gh release upload "$GITHUB_REF_NAME" dist/* --clobber
+          # Manual runs (workflow_dispatch) pass the tag as an input, because
+          # a dispatch run's ref is the branch, not the tag.
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/* --clobber
           else
-            gh release create "$GITHUB_REF_NAME" dist/* --title "$GITHUB_REF_NAME" --notes-file notes.md $pre
+            gh release create "$TAG" dist/* --title "$TAG" --notes-file notes.md $pre
           fi
