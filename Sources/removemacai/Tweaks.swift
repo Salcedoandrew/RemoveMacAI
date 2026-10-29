@@ -135,7 +135,7 @@ struct Tweak: Identifiable {
   var restart: [String] = []
   var presets: Set<Preset> = []
   /// The first macOS version (major, minor) that has the setting.
-  var since: (Int, Int) = (14, 0)
+  var since: (Int, Int) = (13, 0)
 
   var inProfile: Bool { changes.contains { $0.inProfile } }
 
@@ -194,14 +194,14 @@ enum Tweaks {
       id: "click-to-desktop", group: .annoyances, title: "Stop clicks on the wallpaper hiding windows",
       detail: "Stops every window sliding away when you click the wallpaper by mistake.",
       changes: [.pref("com.apple.WindowManager", "EnableStandardClickToShowDesktop", .bool(false))],
-      presets: [.recommended]),
+      presets: [.recommended], since: (14, 0)),
     Tweak(
       id: "desktop-widgets", group: .annoyances, title: "Hide desktop widgets",
       detail: "Hides widgets on the desktop, including in Stage Manager.",
       changes: [
         .pref("com.apple.WindowManager", "StandardHideWidgets", .bool(true)),
         .pref("com.apple.WindowManager", "StageManagerHideWidgets", .bool(true)),
-      ]),
+      ], since: (14, 0)),
     Tweak(
       id: "media-keys", group: .annoyances, title: "Turn off the play, pause and skip keys",
       detail: "Turns off the service behind the media keys, so the play key can't open Music.",
