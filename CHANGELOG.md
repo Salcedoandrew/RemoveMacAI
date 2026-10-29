@@ -9,6 +9,14 @@
 - The app is translated into Hindi and Urdu (#101). Urdu keeps the names of macOS screens and buttons in English, since macOS has no Urdu interface.
 - Block Music launches is now called Stop Music from opening, even by hand, and its warning says Music won't open at all until you undo it. The old name read as if only AirPods were blocked (#67).
 
+## 1.2.0-ventura.2
+
+Same build as 1.2.0-ventura.1, re-tagged so CI can build it. The
+.1 release was created before this fork's workflows were enabled
+(the Actions-tab banner gate on fresh forks), so its tag push never
+triggered a build and the .1 release has no assets. No functional
+changes.
+
 ## 1.2.0-ventura.1
 
 Ventura (macOS 13) variant. Apple Intelligence does not exist on
