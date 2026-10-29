@@ -23,7 +23,7 @@ jobs:
           mkdir -p stage dist
           cp "$(swift build -c release --arch arm64 --show-bin-path)/removemacai" LICENSE THIRD-PARTY-NOTICES.md stage/
           COPYFILE_DISABLE=1 tar -czf dist/removemacai-darwin-arm64.tar.gz -C stage removemacai LICENSE THIRD-PARTY-NOTICES.md
-          tools/build-app.sh
+          bash tools/build-app.sh
           ditto -c -k --keepParent .build/RemoveMacAI.app dist/RemoveMacAI.zip
           cd dist
           shasum -a 256 removemacai-darwin-arm64.tar.gz > removemacai-darwin-arm64.tar.gz.sha256
@@ -41,4 +41,11 @@ jobs:
           version="${GITHUB_REF_NAME#v}"
           awk -v v="## $version" '$0 == v {on=1; next} /^## / {on=0} on' CHANGELOG.md > notes.md
           pre=""; [[ "$GITHUB_REF_NAME" == *-* ]] && pre="--prerelease"
-          gh release create "$GITHUB_REF_NAME" dist/* --title "$GITHUB_REF_NAME" --notes-file notes.md $pre
+          # Fork adaptation: the connector has no tag tool, so the release
+          # (and its tag) are created in the web UI first, which triggers
+          # this workflow. Upload into that release when it already exists.
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" dist/* --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" dist/* --title "$GITHUB_REF_NAME" --notes-file notes.md $pre
+          fi
