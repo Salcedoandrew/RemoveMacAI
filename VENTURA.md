@@ -53,9 +53,18 @@ the local commit history.
 ## Release flow (fork + CI, Apple silicon)
 
 1. Fork to `Salcedoandrew/RemoveMacAI`, push branch `ventura`.
-2. Fresh forks ship with Actions disabled: enable them first
-   (Settings > Actions > Allow all actions and reusable workflows),
-   or the tag push builds nothing.
+2. Fresh forks ship with Actions disabled behind TWO gates, and both
+   must be cleared, or the tag push builds nothing:
+   (a) the Actions-tab banner "Workflows aren't being run on this
+   forked repository" — click "I understand my workflows, go ahead
+   and enable them" (this is the gate that actually blocks runs);
+   (b) Settings > Actions > Allow all actions and reusable workflows.
+   If a tag push fired while the banner gate was still up, no run is
+   created retroactively — re-run the build by hand instead of
+   re-creating the release: Actions > Release > Run workflow, branch
+   `ventura`, tag input `v1.2.0-ventura.1` (the workflow takes the
+   tag as an input for dispatch runs, since a dispatch run's ref is
+   the branch, and uploads into the existing release).
 3. Create the release in the web UI (the connector has no tag tool):
    tag `v1.2.0-ventura.1`, target branch `ventura`, title
    `v1.2.0-ventura.1`, notes from the `## 1.2.0-ventura.1`
