@@ -7,8 +7,11 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-swift build -c release --arch arm64
-bin="$(swift build -c release --arch arm64 --show-bin-path)/removemacai"
+# Build arch: arm64 by default; REMOVEMACAI_ARCH=x86_64 for an Intel Ventura Mac.
+arch="${REMOVEMACAI_ARCH:-arm64}"
+
+swift build -c release --arch "$arch"
+bin="$(swift build -c release --arch "$arch" --show-bin-path)/removemacai"
 version="$("$bin" --version)"
 
 app=".build/RemoveMacAI.app"
@@ -47,7 +50,7 @@ cat > "$app/Contents/Info.plist" <<PLIST
   <key>CFBundleShortVersionString</key><string>$version</string>
   <key>CFBundleVersion</key><string>$version</string>
   <key>LSApplicationCategoryType</key><string>public.app-category.utilities</string>
-  <key>LSMinimumSystemVersion</key><string>15.1</string>
+  <key>LSMinimumSystemVersion</key><string>13.0</string>
   <key>NSHighResolutionCapable</key><true/>
   <key>NSHumanReadableCopyright</key><string>MIT License. Apple Intelligence removal builds on pared by 4evy.</string>
 </dict>
